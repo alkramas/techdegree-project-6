@@ -2,6 +2,7 @@
 // dom element selection
 const qwerty = document.querySelector('div#qwerty');
 const phrase = document.querySelector('div#phrase');
+let typedletter;
 let phraseArray;
 let missed = 0;
 
@@ -42,3 +43,13 @@ function addPhraseToDisplay(arr) {
 };
 
 addPhraseToDisplay(phraseArray);
+
+//
+function checkLetter(button) {
+  let letters = document.querySelector('.letter').innerText;
+  for (let i = 0; i < letters.length; i += 1) {
+    if (letters[i].includes(typedletter)) {
+        
+    } else
+  };
+};
