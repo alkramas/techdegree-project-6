@@ -2,7 +2,7 @@
 // dom element selection
 const qwerty = document.querySelector('div#qwerty');
 const phrase = document.querySelector('div#phrase');
-let typedletter;
+// let typedletter;
 let phraseArray;
 let missed = 0;
 
@@ -35,49 +35,49 @@ function addPhraseToDisplay(arr) {
     li.innerText = phraseArray[x];
     let ul = phrase.children;
       if (phraseArray[x] !== " ") {
-          li.classList.add("letter");
+          li.className = "letter";
          }
     ul[0].appendChild(li);
-    console.log(phrase);
+    // console.log(phrase);
   };
 };
-
 addPhraseToDisplay(phraseArray);
 
 
 
-//The checkLetter function should get all of the
-// elements with a class of “letter” (remember that we added the letter class to all of the letters and none of the spaces when we made the game display).
+//call timeout to load appended nodes to dom
+window.setTimeout((something) => {
+  console.log(something);
+}, 0, 'timeout logged');
 
-// The function should loop over the letters and check if they match the letter in the button the player has chosen.
-
-// If there’s a match, the function should add the “show” class to the list item containing that letter,
-
-// store the matching letter inside of a variable, and return that letter.
-
-// If a match wasn’t found, the function should return null:
 
 function checkLetter(button) {
   // get selection of all li letters content for comparison
-  const phraseletters = document.querySelector('.letter');
-  const phraselettersText = phraseletters.innerText;
-  // console.log(letters);
+  let phraseletters = document.querySelectorAll('.letter');
+  const letterFound = button.innerText;
+  const phraseArrayString = phraseArray.toString();
 
-  // check each letter for match with typed letter
-  for (let i = 0; i < phraselettersText.length; i += 1) {
-    if (phraselettersText[i].includes(typedletter)) {
-      phraselettersText[i].parentNode.addClass('show');
+  // console.log(letterFound);
+  for (let i = 0; i <   phraseletters.length; i += 1) {
+    let phraselettersTextValue = phraseletters[i].innerText;
+    let phraselettersText = phraselettersTextValue.toLowerCase();
+    // console.log(phraselettersText);
+    if (phraselettersText.includes(letterFound)) {
+      // phraselettersText[i].parentNode.addClass('show');
+      console.log('found match');
+      phraseletters[i].classList.add('show');
     }
-  };
+  }
 };
 
-// Add an event listener to the keyboard.
-qwerty.addEventListener('click', function() {
-  // console.log(event.target);
-  let eventTar = event.target;
-  // eventTar.addClass('chosen');
+// Add an event listener to the keyboard container, call checkLetter function on event
+qwerty.addEventListener('click', (event) => {
+  // add class on typed letters
+  if (event.target.tagName == 'BUTTON') {
+      event.target.className = 'chosen';
+      event.target.disabled = true;
+      const targetbutton = event.target;
+      // console.log(targetbutton);
+      checkLetter(targetbutton);
+  }
 });
-
-// Use event delegation to listen only to button events from the keyboard. When a player chooses a letter, add the “chosen” class to that button so the same letter can’t be chosen twice.
-// Note that button elements have an attribute you can set called “disabled” that when set to true will not respond to user clicks. See the MDN documentation for more details.
-// Pass the button to the checkLetter function, and store the letter returned inside of a variable called letterFound. At this point, you can open the index.html file, click any of the letters on the keyboard, and start to see the letters appear in the phrase.
