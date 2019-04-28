@@ -22,11 +22,11 @@ const allhearts = `
   <li class="tries"><img src="images/liveHeart.png" height="35px" width="30px"></li>
 `;
 
-function Timeout() {
-  window.setTimeout((something) => {
-    console.log(something);
-  }, 200, 'timeout logged');
-};
+function resetOverlay(displayvalue, win, lose) {
+  overlay.style.display = displayvalue;
+  overlay.classList.remove(win);
+  overlay.classList.remove(lose);
+}
 
 // get a random phrase and split array item into characters
 function getRandomPhraseAsArray(arr) {
@@ -54,43 +54,46 @@ function addPhraseToDisplay(arr) {
 };
 addPhraseToDisplay(phraseArray);
 
-//call timeout to load appended nodes to dom
-// Timeout();
+
 
 btn.addEventListener('click', (e) => {
-    if (btn.textContent === 'Start Game') {
-      overlay.style.display = 'none';
+    // reset variables that count progress of game
+    function resetCounters() {
       missed = 0;
       correctGuesses = 0;
-      overlay.classList.remove('lose');
-      overlay.classList.remove('win');
+    };
+    // reset parameters for first start:
+    function startGame() {
+      resetCounters();
+      resetOverlay('none', 'win', 'lose');
+    };
+    // clear parameter to start over again:
+    function startOver() {
+      // loop throug list li.letters, remove li from previous phrase
+      let ul = document.querySelector('ul');
+      while (ul.hasChildNodes()) {
+        ul.removeChild(ul.firstChild);
+      }
+      // create and append new random phrase
+      getRandomPhraseAsArray(phrases);
+      addPhraseToDisplay(phraseArray);
+      resetOverlay('none', 'win', 'lose');
+      resetCounters();
+      // restore all hearts to dom from template literal:
+      scoreboard.innerHTML = allhearts;
+      const buttonsChosen = document.querySelectorAll('.chosen');
+      // loop through buttons with class chosen and remove class for new try:
+      for (let i = 0; i < buttonsChosen.length; i += 1) {
+        buttonsChosen[i].className = '';
+        buttonsChosen[i].disabled = false;
+      }
+    };
+    if (btn.textContent === 'Start Game') {
+      // overlay.style.display = 'none';
+      startGame();
     } else if (btn.textContent === 'Start over again') {
         //remove previous li's with phrase letters
-        let ul = document.querySelector('ul');
-        let ulChild = ul.children;
-
-        // remove previous phrases li.letters
-        while (ul.hasChildNodes()) {
-          ul.removeChild(ul.firstChild);
-        }
-        // create and append new random phrase
-        getRandomPhraseAsArray(phrases);
-        addPhraseToDisplay(phraseArray);
-        Timeout();
-
-        overlay.style.display = 'none';
-        overlay.classList.remove('lose');
-        overlay.classList.remove('win');
-        missed = 0;
-        correctGuesses = 0;
-        scoreboard.innerHTML = allhearts;
-        const buttonsChosen = document.querySelectorAll('.chosen');
-        // const ul = phrase.children;
-        // const listShow = ul.querySelectorAll('.show');
-        for (let i = 0; i < buttonsChosen.length; i += 1) {
-          buttonsChosen[i].className = '';
-          buttonsChosen[i].disabled = false;
-        }
+      startOver();
     }
 });
 
@@ -98,66 +101,68 @@ btn.addEventListener('click', (e) => {
 // select appended li elements with class letter
 // used in checkletter and checkwin functions
 let phraseletters = document.querySelectorAll('.letter');
-console.log('phraseletter is ' + phraseletters );
 let phraselength = phraseletters.length;
 
 
 // function: test typed letter with phrase, handle branches
 function checkLetter(button) {
-  // get selection of all li letters content for comparison
   const letterFound = button.innerText;
-  console.log('Letter Found is '+ letterFound);
   const phraseString = phraseArray.toString();
   const phraseStringLower = phraseString.toLowerCase();
 
-  // handle wrong guesses
-  if (!phraseStringLower.includes(letterFound)) {
+  // function handle wrong guesses
+  function wrongGuess() {
     missed += 1;
     const scoreboardItem = document.querySelector('.tries');
-    console.log('you have ' + (5 - missed) + ' guess(es) left');
+    scoreboardItem.classList.add('remove');
+    // console.log('you have ' + (5 - missed) + ' guess(es) left');
     scoreboard.removeChild(scoreboardItem);
-  } else {
-      // handle correct guesses
-      phraseletters = '';
-      phraselength = 0;
-      Timeout();
-      phraseletters = document.querySelectorAll('.letter');
-      phraselength = phraseletters.length;
+  }
+  // function handle correct guesses
+  function correctGuess() {
+    phraseletters = '';
+    phraselength = 0;
+    phraseletters = document.querySelectorAll('.letter');
+    phraselength = phraseletters.length;
 
-      for (let i = 0; i < phraseletters.length; i += 1) {
-        let phraselettersItem = phraseletters[i];
-        // console.log('phraselettersItem is ' + phraselettersItem)
-        let phraselettersItemHTML = phraselettersItem.innerHTML;
-        let phraselettersText = phraselettersItemHTML.toLowerCase();
+    for (let i = 0; i < phraseletters.length; i += 1) {
+      let phraselettersItem = phraseletters[i];
+      let phraselettersItemHTML = phraselettersItem.innerHTML;
+      let phraselettersText = phraselettersItemHTML.toLowerCase();
 
-        if (phraselettersText.includes(letterFound)) {
-          // console.log('match occured with letter from keyboard: ' + letterFound);
-          phraseletters[i].classList.add('show');
-          correctGuesses += 1;
-        }
+      if (phraselettersText.includes(letterFound)) {
+        phraseletters[i].classList.add('show');
+        correctGuesses += 1;
       }
+    }
+  }
+  // handle wrong guesses branch
+  if (!phraseStringLower.includes(letterFound)) {
+    wrongGuess();
+  } else {
+    // handle correct guesses
+    correctGuess();
   }
 };
 
+
+
 function checkWin() {
+  function winLoseMessage(className, messageTitle, btnText) {
+    overlay.style.display = '';
+    overlay.classList.add(className);
+    const message = document.querySelector('.title');
+    message.textContent = messageTitle;
+    btn.textContent = btnText;
+  };
   const btn = document.querySelector('a.btn__reset');
   // handle loose branch with if
   if (missed == 5) {
-    console.log('you lost');
-    overlay.style.display = '';
-    overlay.classList.add('lose');
-    const message = document.querySelector('.title');
-    message.textContent = 'Sorry, you lost!';
-    btn.textContent = 'Start over again';
+    winLoseMessage('lose', 'Sorry you lost!', 'Start over again');
   }
   // handle win branch with else
   else if (correctGuesses == phraselength) {
-    console.log('you won');
-    overlay.style.display = '';
-    overlay.classList.add('win');
-    const message = document.querySelector('.title');
-    message.textContent = 'Congratulations, you won!';
-    btn.textContent = 'Start over again';
+    winLoseMessage('win', 'Congratulations, you won!', 'Start over again');
   }
 };
 
