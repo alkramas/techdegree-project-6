@@ -48,6 +48,9 @@ function addPhraseToDisplay(arr) {
       if (phraseArray[x] !== " ") {
           li.className = "letter";
          }
+      else {
+        li.className = "space";
+      }
     ul[0].appendChild(li);
   };
   return phrase;
@@ -69,11 +72,6 @@ btn.addEventListener('click', (e) => {
     };
     // clear parameter to start over again:
     function startOver() {
-      // loop throug list li.letters, remove li from previous phrase
-      let ul = document.querySelector('ul');
-      while (ul.hasChildNodes()) {
-        ul.removeChild(ul.firstChild);
-      }
       // create and append new random phrase
       getRandomPhraseAsArray(phrases);
       addPhraseToDisplay(phraseArray);
@@ -154,6 +152,12 @@ function checkWin() {
     const message = document.querySelector('.title');
     message.textContent = messageTitle;
     btn.textContent = btnText;
+    let ul = document.querySelector('ul');
+
+    while (ul.hasChildNodes()) {
+      ul.removeChild(ul.firstChild);
+    }
+
   };
   const btn = document.querySelector('a.btn__reset');
   // handle loose branch with if
